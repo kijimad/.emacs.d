@@ -1706,7 +1706,13 @@ How to send a bug report:
 
 (add-to-list 'auto-mode-alist '("\\.ya?ml$" . yaml-mode))
 
+;; Emacs 30.2 互換性: origami の face を修正(require前に定義)
+(defface origami-fold-header-face
+  '((t (:box (:line-width 1) :background unspecified)))
+  "Face for origami fold headers"
+  :group 'origami)
 (require 'origami)
+
 (define-minor-mode origami-view-mode
   "TABにorigamiの折畳みを割り当てる"
   nil "折紙"
@@ -1957,25 +1963,6 @@ How to send a bug report:
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
   :init
   (all-the-icons-completion-mode +1))
-
-;; (use-package tabnine
-;;   :commands (tabnine-start-process)
-;;   :hook (prog-mode . tabnine-mode)
-;;   :straight t
-;;   :diminish "⌬"
-;;   :custom
-;;   (tabnine-wait 1)
-;;   (tabnine-minimum-prefix-length 2)
-;;   :hook (kill-emacs . tabnine-kill-process)
-;;   :bind
-;;   (:map  tabnine-completion-map
-;; 	 ("<tab>" . tabnine-accept-completion)
-;; 	 ("TAB" . tabnine-accept-completion)
-;; 	 ("M-f" . tabnine-accept-completion-by-word)
-;; 	 ("M-<return>" . tabnine-accept-completion-by-line)
-;; 	 ("C-g" . tabnine-clear-overlay)
-;; 	 ("M-[" . tabnine-previous-completion)
-;; 	 ("M-]" . tabnine-next-completion)))
 
 (require 'lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
@@ -2259,14 +2246,9 @@ How to send a bug report:
               ("qutebrowser" (exwm-workspace-rename-buffer (format "Qutebrowser: %s" exwm-title)))
               ("chrome" (exwm-workspace-rename-buffer (format "Chrome: %s" exwm-title))))))
 
-(defun kd/set-init ()
+(defun kd/init ()
   "Window Manager関係の各種プログラムを起動する."
   (interactive)
-
-  ;; (kd/set-background)
-
-  (call-process-shell-command "shepherd")
-  (call-process-shell-command "~/dotfiles/.config/polybar/launch.sh")
 
   (exwm-workspace-switch-create 0)
   (start-process-shell-command "google-chrome" nil "google-chrome")
@@ -2348,9 +2330,6 @@ How to send a bug report:
 (when window-system
   (progn
     (exwm-config-example)
-
-    ;; (tabnine-start-process)
-    ;; (kd/set-init)
     ))
 
 (require 'exwm-randr)
