@@ -1196,6 +1196,7 @@ How to send a bug report:
 (require 'mozc)
 (set-language-environment "Japanese")
 (setq default-input-method "japanese-mozc")
+(setq mozc-helper-program-name "mozc_emacs_helper")
 (global-set-key (kbd "C-SPC") 'toggle-input-method)
 
 (add-hook 'input-method-activate-hook
@@ -2226,7 +2227,7 @@ How to send a bug report:
             ([?\C-d] . [delete])
             ([?\C-k] . [S-end delete]))))
   ;; Enable EXWM
-  (exwm-enable))
+  (exwm-wm-mode))
 
 (setq exwm-replace t)
 
