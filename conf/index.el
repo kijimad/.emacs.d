@@ -198,12 +198,10 @@
           (lambda ()
             (start-process-shell-command "" nil "aplay ~/dotfiles/sounds/suzu.wav")))
 
-;; effortが設定されていると、なぜかorg-timer-set-timerが使えないのでしょうがなく...
+;; effortが設定されていると、なぜかorg-timer-set-timerが使えないのでしょうがなくorg-pomodoroで...
 (defun kd/minitask-timer ()
   "5分タイマーでタスク開始する"
   (interactive)
-  ;; 終了時にカウントが進んでしまうので、先に引いておく...
-  (setq kd/pmd-today-point (- kd/pmd-today-point 1))
   (let* ((org-pomodoro-length 5))
     (org-pomodoro)))
 
@@ -650,52 +648,6 @@ How to send a bug report:
          (match-end 1))
       "")))
 
-(org-super-agenda-mode)
-
-(let ((org-super-agenda-groups
-       '(;; Each group has an implicit boolean OR operator between its selectors.
-         (:name "Today"  ; Optionally specify section name
-                :time-grid t  ; Items that appear on the time grid
-                :todo "TODAY")  ; Items that have this TODO keyword
-         (:name "Important"
-                ;; Single arguments given alone
-                :tag "bills"
-                :priority "A")
-         (:name "WIP"
-                ;; Single arguments given alone
-                :todo "WIP")
-         ;; Set order of multiple groups at once
-         (:order-multi (2 (:name "Shopping in town"
-                                 ;; Boolean AND group matches items that match all subgroups
-                                 :and (:tag "shopping" :tag "@town"))
-                          (:name "Food-related"
-                                 :habit t
-                                 ;; Multiple args given in list with implicit OR
-                                 :tag ("food" "dinner"))
-                          (:name "Space-related (non-moon-or-planet-related)"
-                                 ;; Regexps match case-insensitively on the entire entry
-                                 :and (:regexp ("space" "NASA")
-                                               ;; Boolean NOT also has implicit OR between selectors
-                                               :not (:regexp "moon" :tag "planet")))))
-         ;; Groups supply their own section names when none are given
-         (:todo ("SOMEDAY" "TO-READ" "TO-WRITE" "CHECK" "TO-WATCH" "WATCHING")
-                ;; Show this group at the end of the agenda (since it has the
-                ;; highest number). If you specified this group last, items
-                ;; with these todo keywords that e.g. have priority A would be
-                ;; displayed in that group instead, because items are grouped
-                ;; out in the order the groups are listed.
-                :order 9)
-         (:priority<= "B"
-                      ;; Show this section after "Today" and "Important", because
-                      ;; their order is unspecified, defaulting to 0. Sections
-                      ;; are displayed lowest-number-first.
-                      :order 1)
-         ;; After the last group, the agenda will display items that didn't
-         ;; match any of these groups, with the default order position of 99
-         )))
-  ;; (org-agenda nil "a")
-  )
-
 (require 'org-pomodoro)
 
 (define-key global-map [insert] 'org-pomodoro)
@@ -775,8 +727,19 @@ How to send a bug report:
      )))
 
 (defvar kd/pmd-today-point 0)
+(defvar kd/pmd-start-time nil)
+
+(add-hook 'org-pomodoro-started-hook
+          (lambda ()
+            (setq kd/pmd-start-time (current-time))))
+
 (add-hook 'org-pomodoro-finished-hook
-          (lambda () (setq kd/pmd-today-point (1+ kd/pmd-today-point))))
+          (lambda ()
+            (when kd/pmd-start-time
+              (let ((duration (- (float-time (current-time))
+                                 (float-time kd/pmd-start-time))))
+                (when (>= duration (* 24 60))
+                  (setq kd/pmd-today-point (1+ kd/pmd-today-point)))))))
 
 (defun kd/write-pmd (str)
   (shell-command (format "echo '%s' >> ~/roam/pmd.csv" str)))
@@ -2801,3 +2764,62 @@ and source-file directory for your debugger."
 
 (require 'spray)
 (setq spray-wpm 200)
+
+(defun kd/denote-format ()
+  "仕上げる。"
+  (interactive)
+  (progn
+    (flush-lines "^\\#\s.+?")
+    (kd/org-remove-comment-block)
+    (kd/org-remove-draft-filetag)
+    (denote-rename-file-using-front-matter (buffer-file-name) 0)
+    ))
+
+(defun kd/denote-kdoc-rename ()
+  "自動採番する。"
+  (interactive)
+  (let* ((max 0)
+         (files (directory-files "." nil ".*--kdoc-\\([0-9].+?\\)$"))
+         (numbers (mapcar (lambda (name)
+                            (if (nth 3 (split-string name "-"))
+                                (setq max (string-to-number (nth 3 (split-string name "-")))))
+                            ) files)))
+    (save-excursion
+      (beginning-of-buffer)
+      (if (search-forward "KDOC n" nil t)
+          (replace-match (format "KDOC %d" (+ max 1)))))
+    (denote-rename-file-using-front-matter (buffer-file-name) 0)))
+
+(defun kd/org-remove-comment-block ()
+  "コメントブロックを削除する。"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^\\s-*#\\+begin_comment\\s-*$" nil t)
+      (let ((start (match-beginning 0)))
+        (when (re-search-forward "^\\s-*#\\+end_comment\\s-*$" nil t)
+          (delete-region start (match-end 0))
+          (when (looking-at "\n")
+            (delete-char 1)))))))
+
+(defun kd/org-remove-draft-filetag ()
+  "ドラフトタグを外す。"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+filetags:[ \t]*\\(.*\\)" nil t)
+      (let* ((tags (match-string 1))
+             (new-tags (replace-regexp-in-string ":draft:" ":" tags)))
+        (replace-match new-tags nil nil nil 1)))))
+
+(defun kd/ensure-blank-line-before-status ()
+  "「* この文書のステータス」の前に必ず空行を入れる。"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "^\\* この文書のステータス" nil t)
+      (beginning-of-line)
+      (unless (looking-back "\n\n" 2)
+        (if (looking-back "\n" 1)
+            (insert "\n")
+          (insert "\n\n"))))))
