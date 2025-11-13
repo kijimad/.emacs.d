@@ -4,7 +4,7 @@ gen-html: ## literate orgから、HTMLファイルを生成する
 	@emacs --batch -l ./publish.el --funcall kd/publish
 
 gen-el: ## literate orgから、emacs lispファイルを出力する
-	@emacs --batch -l ./init.el -l ./publish.el --funcall kd/gen-el && echo success🎉
+	@emacs --batch -l ./publish.el --funcall kd/gen-el && echo success🎉
 
 help: ## ヘルプを表示する
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

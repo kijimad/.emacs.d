@@ -55,4 +55,4 @@
   (org-publish-all t))
 
 (defun kd/gen-el ()
-  (org-babel-load-file "~/.emacs.d/conf/index.org"))
+  (org-babel-tangle-file "~/.emacs.d/conf/index.org" "~/.emacs.d/conf/index.el" "emacs-lisp"))
