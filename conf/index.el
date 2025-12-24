@@ -544,8 +544,9 @@ How to send a bug report:
   ;; mini-bufferを開いている間にpersp-switchが走ると、プロンプトが残り続けるのを防ぐ
   (when (window-minibuffer-p)
     (minibuffer-keyboard-quit))
+  (exwm-workspace-switch 0)
   (persp-switch "2")
-  (org-agenda nil "z"))
+)
 (global-set-key (kbd "<f6>") 'org-agenda-default)
 
 (add-hook 'org-pomodoro-short-break-finished-hook 'org-agenda-default)

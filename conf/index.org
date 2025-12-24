@@ -765,8 +765,9 @@ org-agendaはorg-modeでtodo管理する機能。
     ;; mini-bufferを開いている間にpersp-switchが走ると、プロンプトが残り続けるのを防ぐ
     (when (window-minibuffer-p)
       (minibuffer-keyboard-quit))
+    (exwm-workspace-switch 0)
     (persp-switch "2")
-    (org-agenda nil "z"))
+  )
   (global-set-key (kbd "<f6>") 'org-agenda-default)
 #+end_src
 
