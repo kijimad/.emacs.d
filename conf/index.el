@@ -154,7 +154,7 @@
      '(org-code ((t (:inherit (shadow fixed-pitch)))))
      '(org-document-info ((t (:foreground "dark orange"))))
      '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-     '(org-indent ((t (:inherit (shadow fixed-pitch)))))
+     '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
      '(org-link ((t (:foreground "royal blue" :underline t))))
      '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
      '(org-property-value ((t (:inherit fixed-pitch))) t)
@@ -209,6 +209,13 @@
 (global-set-key (kbd "S-<down>")  'windmove-down)
 (global-set-key (kbd "S-<up>")    'windmove-up)
 (global-set-key (kbd "S-<right>") 'windmove-right)
+
+(add-hook 'org-mode-hook 'org-appear-mode)
+(setq org-hide-emphasis-markers t)
+(setq org-appear-autolinks t)
+(setq org-appear-autoemphasis t)
+(setq org-appear-autosubmarkers t)
+(setq org-appear-autoentities t)
 
 ;;; open-junk-file.el --- Open a junk (memo) file to try-and-error
 
@@ -402,6 +409,11 @@ How to send a bug report:
 ;; (setq org-superstar-item-bullet-alist '((?* . ?•)
 ;;                                         (?+ . ?»)
 ;;                                         (?- . ?➤)))
+
+;; 見出しの記号をカスタマイズ (nilで無効化)
+(setq org-modern-star nil)
+;; たたみ時の記号を元の設定(org-ellipsis)を使う
+(setq org-modern-hide-stars nil)
 
 (add-hook 'org-mode-hook #'org-modern-mode)
 (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)

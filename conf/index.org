@@ -243,7 +243,7 @@ org-modeはEmacsのキラーアプリの1つ。パッケージ名であり、フ
        '(org-code ((t (:inherit (shadow fixed-pitch)))))
        '(org-document-info ((t (:foreground "dark orange"))))
        '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
-       '(org-indent ((t (:inherit (shadow fixed-pitch)))))
+       '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
        '(org-link ((t (:foreground "royal blue" :underline t))))
        '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
        '(org-property-value ((t (:inherit fixed-pitch))) t)
@@ -320,6 +320,16 @@ babelで出力した結果はラップしないとtextlintでエラーになる�
   (global-set-key (kbd "S-<down>")  'windmove-down)
   (global-set-key (kbd "S-<up>")    'windmove-up)
   (global-set-key (kbd "S-<right>") 'windmove-right)
+#+end_src
+
+#+caption: カーソルを上に移動すると展開する
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'org-appear-mode)
+  (setq org-hide-emphasis-markers t)
+  (setq org-appear-autolinks t)
+  (setq org-appear-autoemphasis t)
+  (setq org-appear-autosubmarkers t)
+  (setq org-appear-autoentities t)
 #+end_src
 
 ** open-junk-file
@@ -536,6 +546,11 @@ org-modernはorg-modeの外観をいい感じにするパッケージ。
 
 #+caption: org-modernを有効化する
 #+begin_src emacs-lisp
+  ;; 見出しの記号をカスタマイズ (nilで無効化)
+  (setq org-modern-star nil)
+  ;; たたみ時の記号を元の設定(org-ellipsis)を使う
+  (setq org-modern-hide-stars nil)
+
   (add-hook 'org-mode-hook #'org-modern-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
 #+end_src
