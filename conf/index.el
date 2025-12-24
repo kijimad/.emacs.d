@@ -1675,6 +1675,9 @@ How to send a bug report:
 (use-package ob-go-asm
   :straight (:host github :repo "kijimaD/ob-go-asm"))
 
+(use-package ob-go-test
+  :straight (:host github :repo "kijimaD/ob-go-test"))
+
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
@@ -2384,7 +2387,7 @@ How to send a bug report:
       ("j" org-pomodoro "start pomodoro")
       ("k" kd/minitask-timer "start mini timer")
       ("n" elfeed "elfeed")
-      ("u" kd/set-proxy-mode-manual "use proxy")
+      ("u" dictionary-search "look up dictionary")
       ("h" eldoc-doc-buffer "eldoc at pos"))
 
      "Git"
@@ -2508,15 +2511,11 @@ How to send a bug report:
                             (shell-quote-argument passwd)
                             " | sudo -S ifconfig `basename $intf` down; done"))))
 
-(defun kd/set-proxy-mode-manual ()
-  "プロキシをmanual modeにする"
-  (interactive)
-  (shell-command "gsettings set org.gnome.system.proxy mode 'manual'")
-  (message "use proxy..."))
-
 ;; (use-package ej-dict
 ;;   :straight (:host github :repo "kijimaD/ej-dict"))
 ;; (ej-dict-install-dict)
+
+(setq dictionary-server "dict.org")
 
 (defun my-exchange-point-and-mark ()
   (interactive)
@@ -2786,6 +2785,7 @@ and source-file directory for your debugger."
   (progn
     (flush-lines "^\\#\s.+?")
     (kd/org-remove-comment-block)
+    (kd/ensure-blank-line-before-status)
     (kd/org-remove-draft-filetag)
     (denote-rename-file-using-front-matter (buffer-file-name) 0)
     ))

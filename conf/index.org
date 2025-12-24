@@ -2372,6 +2372,12 @@ goの設定。
     :straight (:host github :repo "kijimaD/ob-go-asm"))
 #+end_src
 
+#+caption: Goテストを実行するorg-babel
+#+begin_src emacs-lisp
+  (use-package ob-go-test
+    :straight (:host github :repo "kijimaD/ob-go-test"))
+#+end_src
+
 * Haskell
 haskellの設定。
 
@@ -3286,7 +3292,7 @@ Hydraはカスタマイズ可能なキー表示を追加するパッケージ。
         ("j" org-pomodoro "start pomodoro")
         ("k" kd/minitask-timer "start mini timer")
         ("n" elfeed "elfeed")
-        ("u" kd/set-proxy-mode-manual "use proxy")
+        ("u" dictionary-search "look up dictionary")
         ("h" eldoc-doc-buffer "eldoc at pos"))
 
        "Git"
@@ -3433,21 +3439,18 @@ OS操作の便利関数。
                               " | sudo -S ifconfig `basename $intf` down; done"))))
 #+end_src
 
-#+caption: プロキシ設定を変更する(Ubuntu)
-#+begin_src emacs-lisp
-  (defun kd/set-proxy-mode-manual ()
-    "プロキシをmanual modeにする"
-    (interactive)
-    (shell-command "gsettings set org.gnome.system.proxy mode 'manual'")
-    (message "use proxy..."))
-#+end_src
-
 #+caption: 英語辞書をインストールする。あまり使ってないのでコメントアウトしている
 #+begin_src emacs-lisp
   ;; (use-package ej-dict
   ;;   :straight (:host github :repo "kijimaD/ej-dict"))
   ;; (ej-dict-install-dict)
 #+end_src
+
+#+caption: (dictionary-search)で確認が出ないように指定する
+#+begin_src emacs-lisp
+  (setq dictionary-server "dict.org")
+#+end_src
+
 * Helper
 
 その他の便利関数。
@@ -3763,6 +3766,7 @@ sprayは速読表示してくれる拡張。
     (progn
       (flush-lines "^\\#\s.+?")
       (kd/org-remove-comment-block)
+      (kd/ensure-blank-line-before-status)
       (kd/org-remove-draft-filetag)
       (denote-rename-file-using-front-matter (buffer-file-name) 0)
       ))
