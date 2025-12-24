@@ -217,6 +217,8 @@
 (setq org-appear-autosubmarkers t)
 (setq org-appear-autoentities t)
 
+(setq midnight-mode t)
+
 ;;; open-junk-file.el --- Open a junk (memo) file to try-and-error
 
 ;; $Time-stamp: <2016-09-13 10:59:40 rubikitch>$

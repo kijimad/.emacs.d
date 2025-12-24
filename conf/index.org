@@ -332,6 +332,11 @@ babelで出力した結果はラップしないとtextlintでエラーになる�
   (setq org-appear-autoentities t)
 #+end_src
 
+#+caption: バッファを自動削除する
+#+begin_src emacs-lisp
+  (setq midnight-mode t)
+#+end_src
+
 ** open-junk-file
 #+caption: Cask install が失敗するので取り込んでいる
 #+begin_src emacs-lisp
