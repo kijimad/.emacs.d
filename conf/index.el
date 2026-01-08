@@ -2590,27 +2590,11 @@ How to send a bug report:
   (funcall #'isearch-done nopush edit)
   (when isearch-other-end (goto-char isearch-other-end)))
 
-(defun my-next-line ()
-  (interactive)
-  (next-line)
-  (recenter))
-(global-set-key (kbd "<down>") 'my-next-line)
-
-(defun my-previous-line ()
-  (interactive)
-  (previous-line)
-  (recenter))
-(global-set-key (kbd "<up>") 'my-previous-line)
-
 (eval-after-load "eww"
   '(progn
-     (define-key eww-mode-map (kbd "<mouse-1>") 'my-next-line)
      (define-key eww-mode-map (kbd "<mouse-2>") 'define-word-at-point)
-     (define-key eww-mode-map (kbd "<mouse-4>") 'my-previous-line)
      (define-key eww-mode-map (kbd "<down-mouse-4>") 'nil)
-     (define-key eww-mode-map (kbd "<mouse-5>") 'my-next-line)
      (define-key eww-mode-map (kbd "<down-mouse-5>") 'nil)
-     (define-key eww-mode-map (kbd "<mouse-3>") 'my-previous-line)
      (define-key eww-mode-map (kbd "<mouse-8>") 'backward-word)
      (define-key eww-mode-map (kbd "<mouse-9>") 'forward-word)))
 
