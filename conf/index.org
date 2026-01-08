@@ -3546,32 +3546,13 @@ OS操作の便利関数。
     (when isearch-other-end (goto-char isearch-other-end)))
 #+end_src
 
-#+caption: カーソルを真ん中に保ちつつ行を1つ移動する
-#+begin_src emacs-lisp
-  (defun my-next-line ()
-    (interactive)
-    (next-line)
-    (recenter))
-  (global-set-key (kbd "<down>") 'my-next-line)
-
-  (defun my-previous-line ()
-    (interactive)
-    (previous-line)
-    (recenter))
-  (global-set-key (kbd "<up>") 'my-previous-line)
-#+end_src
-
 #+caption: ewwのキーバインドを設定する
 #+begin_src emacs-lisp
   (eval-after-load "eww"
     '(progn
-       (define-key eww-mode-map (kbd "<mouse-1>") 'my-next-line)
        (define-key eww-mode-map (kbd "<mouse-2>") 'define-word-at-point)
-       (define-key eww-mode-map (kbd "<mouse-4>") 'my-previous-line)
        (define-key eww-mode-map (kbd "<down-mouse-4>") 'nil)
-       (define-key eww-mode-map (kbd "<mouse-5>") 'my-next-line)
        (define-key eww-mode-map (kbd "<down-mouse-5>") 'nil)
-       (define-key eww-mode-map (kbd "<mouse-3>") 'my-previous-line)
        (define-key eww-mode-map (kbd "<mouse-8>") 'backward-word)
        (define-key eww-mode-map (kbd "<mouse-9>") 'forward-word)))
 #+end_src
