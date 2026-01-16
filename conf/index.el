@@ -2868,3 +2868,35 @@ and source-file directory for your debugger."
         (if (looking-back "\n" 1)
             (insert "\n")
           (insert "\n\n"))))))
+
+(defun kd/next-file ()
+  "同じディレクトリの次のファイルを開く。"
+  (interactive)
+  (kd/navigate-sibling-file 1))
+
+(defun kd/previous-file ()
+  "同じディレクトリの前のファイルを開く。"
+  (interactive)
+  (kd/navigate-sibling-file -1))
+
+(defun kd/navigate-sibling-file (direction)
+  "DIRECTION (1 or -1) に応じて、同じディレクトリの次/前のファイルを開く。"
+  (let* ((current-file (buffer-file-name))
+         (dir (file-name-directory current-file))
+         (current-name (file-name-nondirectory current-file))
+         (files (seq-remove (lambda (f) (file-directory-p (expand-file-name f dir)))
+                          (directory-files dir nil "^[^.]")))
+         (files-sorted (sort files 'string<))
+         (current-index (cl-position current-name files-sorted :test 'equal)))
+    (if current-index
+        (let* ((next-index (+ current-index direction))
+               (next-file (nth next-index files-sorted)))
+          (if next-file
+              (find-file (expand-file-name next-file dir))
+            (message (if (> direction 0)
+                        "最後のファイルです"
+                      "最初のファイルです"))))
+      (message "現在のファイルがディレクトリ一覧に見つかりません"))))
+
+(global-set-key (kbd "C-c <right>") 'kd/next-file)
+(global-set-key (kbd "C-c <left>") 'kd/previous-file)
