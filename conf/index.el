@@ -1946,7 +1946,8 @@ How to send a bug report:
   ((go-mode . eglot-ensure)
    (js-ts-mode . eglot-ensure)
    (tsx-ts-mode . eglot-ensure)
-   (typescript-ts-mode . eglot-ensure))
+   (typescript-ts-mode . eglot-ensure)
+   (typescript-mode . eglot-ensure))
   :config
   (defun my/eglot-capf ()
     (setq-local completion-at-point-functions
