@@ -33,7 +33,7 @@ jobs:
         path: .cask
         key: cache-cask-packages-000
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - run: git clone https://github.com/cask/cask.git "$HOME/.cask"
     - run: echo "$HOME/.cask/bin" >> $GITHUB_PATH
