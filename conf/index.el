@@ -1760,7 +1760,6 @@ How to send a bug report:
 ;; web-mode
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.js[x]?$" . web-mode));; js + jsx
-(add-to-list 'auto-mode-alist '("\\.tsx$" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
@@ -1867,6 +1866,7 @@ How to send a bug report:
 ;; Typescript ================
 (require 'typescript-mode)
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
 
 (put 'typescript-tsx-mode 'eglot-language-id "typescriptreact")
 
