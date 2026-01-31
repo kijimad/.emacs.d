@@ -1,27 +1,27 @@
 # 書きやすいように、テーマごとに書く
 # 感情、思考、事実を区別する
-* あった出来事
+* Events that occurred
 # <事実>客観的事実を記載する
 -
-* 食事の感想
+* Food to eat
 # <事実>食べた内容、感想を書く
 -
-* うれしかったこと
+* Things that made me happy
 # <事実>どんな些細なことでもよい
 -
-* 鑑賞したこと
+* Things I watched
 # <事実>映画、動画、音楽、ゲーム...
 -
-* 体調の記録
+* Health records
 # <事実>体調を書く
 -
-* 感情の記録
+* Emotional records
 # <感情>気分がどうか、感情を書く
 -
-* 考えたこと
+* Thoughts I had
 # <思考>何について考えたかを書く。結論はなくてよい
 -
-* 依存メトリクス
+* Dependency metrics
 # その日の23:59が過ぎてから記載する
 
 - [ ] Pony
