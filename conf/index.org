@@ -3255,6 +3255,17 @@ EXWMはEmacs上で動くウィンドウマネージャ。
 
 randr関係の修正をしたときは、 ~(exwm-randr-refresh)~ を実行して反映する。例えば、画面と対応したワークスペースを変更したとき。
 
+#+caption: スイッチしたあとChromeでフォーカスが外れた状態になるワークラウンド: https://github.com/emacs-exwm/exwm/issues/18#issuecomment-2000284049
+#+begin_src emacs-lisp
+  (advice-add #'exwm-layout--hide
+                :after (lambda (id)
+                         (with-current-buffer (exwm--id->buffer id)
+                           (setq exwm--ewmh-state
+                                 (delq xcb:Atom:_NET_WM_STATE_HIDDEN exwm--ewmh-state))
+                           (exwm-layout--set-ewmh-state id)
+                           (xcb:flush exwm--connection))))
+#+end_src
+
 * Polybar
 polybarは柔軟にカスタマイズできるメニューバーを表示するソフトウェア。polybarとの連携を記載する。
 

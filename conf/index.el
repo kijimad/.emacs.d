@@ -2371,6 +2371,14 @@ How to send a bug report:
 ;;              "xrandr" nil "xrandr --output HDMI-1 --mode 1920x1080 --same-as eDP-1 --auto")))
 ;; (exwm-randr-enable)
 
+(advice-add #'exwm-layout--hide
+              :after (lambda (id)
+                       (with-current-buffer (exwm--id->buffer id)
+                         (setq exwm--ewmh-state
+                               (delq xcb:Atom:_NET_WM_STATE_HIDDEN exwm--ewmh-state))
+                         (exwm-layout--set-ewmh-state id)
+                         (xcb:flush exwm--connection))))
+
 (defvar kd/polybar-process nil
   "Holds the process of the running Polybar instance, if any")
 
