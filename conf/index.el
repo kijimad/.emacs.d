@@ -71,6 +71,7 @@
                                (js . t)
                                (lisp . t)
                                (python . t)
+                               (go-test . t)
                                (ruby . t)
                                (rust . t)
                                (shell . t)
@@ -1720,10 +1721,11 @@ How to send a bug report:
 (add-hook 'before-save-hook 'gofmt-before-save)
 
 (use-package ob-go-asm
-  :straight (:host github :repo "kijimaD/ob-go-asm"))
+  :straight (:host github :repo "kijimad/ob-go-asm"))
 
+;; straightのデフォルト :filesパターンには :excludeがあり、*-test.elというファイル名を除外する。ob-go-test.elは-test.elで終わるため、デフォルトで除外されてしまう。なのでfilesを指定して防ぐ
 (use-package ob-go-test
-  :straight (:host github :repo "kijimaD/ob-go-test"))
+  :straight (:host github :repo "kijimad/ob-go-test" :files ("*.el")))
 
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
