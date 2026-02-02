@@ -2288,8 +2288,6 @@ How to send a bug report:
   (exwm-workspace-switch-create 0)
   (start-process-shell-command "google-chrome" nil "google-chrome")
   (sleep-for 2)
-  (start-process-shell-command "spotify" nil "spotify")
-  (sleep-for 1)
 
   (persp-switch "1")
   (delete-other-windows)
@@ -2337,6 +2335,10 @@ How to send a bug report:
   (find-file "~/Project")
 
   (exwm-workspace-switch-create 2)
+  (start-process-shell-command "spotify" nil "spotify")
+  (sleep-for 2)
+  (start-process-shell-command "antimicrox" nil "antimicrox")
+  (sleep-for 2)
   (switch-to-buffer "Spotify")
 
   (exwm-workspace-switch-create 0)
