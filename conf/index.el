@@ -71,7 +71,6 @@
                                (js . t)
                                (lisp . t)
                                (python . t)
-                               (go-test . t)
                                (ruby . t)
                                (rust . t)
                                (shell . t)
@@ -1725,7 +1724,11 @@ How to send a bug report:
 
 ;; straightのデフォルト :filesパターンには :excludeがあり、*-test.elというファイル名を除外する。ob-go-test.elは-test.elで終わるため、デフォルトで除外されてしまう。なのでfilesを指定して防ぐ
 (use-package ob-go-test
-  :straight (:host github :repo "kijimad/ob-go-test" :files ("*.el")))
+  :straight (:host github :repo "kijimad/ob-go-test" :files ("*.el"))
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   (cons '(go-test . t) org-babel-load-languages)))
 
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
