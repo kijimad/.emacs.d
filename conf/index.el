@@ -2418,6 +2418,68 @@ How to send a bug report:
 
 (add-hook 'exwm-workspace-switch-hook #'kd/send-polybar-exwm-workspace)
 
+(defvar kd/workday-deadline nil
+  "終了時刻 (time値)")
+
+(defvar kd/workday-start-time nil
+  "開始時刻 (time値)")
+
+(defvar kd/workday-timer nil
+  "polybar更新用タイマー")
+
+(defun kd/set-deadline (time-str)
+  "終了時刻を設定する。TIME-STR は \"18:00\" 形式。"
+  (interactive "s終了時刻 (HH:MM): ")
+  (let* ((parsed (parse-time-string time-str))
+         (now (decode-time))
+         (deadline (encode-time
+                    0
+                    (nth 1 parsed)
+                    (nth 2 parsed)
+                    (nth 3 now)
+                    (nth 4 now)
+                    (nth 5 now))))
+    (setq kd/workday-start-time (current-time))
+    (setq kd/workday-deadline deadline)
+    (when kd/workday-timer (cancel-timer kd/workday-timer))
+    (setq kd/workday-timer
+          (run-at-time 0 60 (lambda () (kd/send-polybar-hook "workday" 1))))
+    (message "Deadline: %s" time-str)))
+
+(defun kd/clear-deadline ()
+  "デッドラインをクリアする。"
+  (interactive)
+  (setq kd/workday-deadline nil)
+  (setq kd/workday-start-time nil)
+  (when kd/workday-timer
+    (cancel-timer kd/workday-timer)
+    (setq kd/workday-timer nil))
+  (kd/send-polybar-hook "workday" 1))
+
+(defun kd/workday-gauge ()
+  "残り時間のゲージとパーセントを返す。"
+  (if (or (null kd/workday-deadline) (null kd/workday-start-time))
+      ""
+    (let* ((now (current-time))
+           (total-sec (float-time (time-subtract kd/workday-deadline kd/workday-start-time)))
+           (elapsed-sec (float-time (time-subtract now kd/workday-start-time)))
+           (display-len 20)
+           (percent (if (<= total-sec 0) 100
+                      (min 100 (max 0 (* (/ elapsed-sec total-sec) 100)))))
+           (done (truncate (* (/ percent 100.0) display-len)))
+           (will (- display-len done)))
+      (if (>= percent 100)
+          (progn
+            (kd/clear-deadline)
+            "")
+        (format "%s%s%s%s %d%% %s"
+                "%{T2}"
+                (concat "%{F#008000}" (make-string done ?|) "%{F-}")
+                (concat "%{F#413839}" (make-string will ?|) "%{F-}")
+                "%{T-}"
+                (truncate percent)
+                (format-time-string "%H:%M" kd/workday-deadline))))))
+
 (require 'perspective)
 (setq persp-initial-frame-name "1")
 (setq persp-modestring-dividers '("" "" " "))
