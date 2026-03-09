@@ -2599,6 +2599,9 @@ web-modeはhtmlライクな複数の言語に対応するモード。
 
   (put 'typescript-tsx-mode 'eglot-language-id "typescriptreact")
 
+  (defun kd/jest-structure ()
+    (interactive)
+    (occur "^\\s-*\\(describe\\|it\\|test\\)\\s-*(['\"`]"))
 #+end_src
 * corfu
 corfuはシンプルな補完を提供するパッケージ。

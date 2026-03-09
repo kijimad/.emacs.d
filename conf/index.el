@@ -1875,6 +1875,10 @@ How to send a bug report:
 
 (put 'typescript-tsx-mode 'eglot-language-id "typescriptreact")
 
+(defun kd/jest-structure ()
+  (interactive)
+  (occur "^\\s-*\\(describe\\|it\\|test\\)\\s-*(['\"`]"))
+
 (require 'corfu)
 (global-corfu-mode)
 
