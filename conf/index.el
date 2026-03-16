@@ -1947,6 +1947,9 @@ How to send a bug report:
 
 (require 'cape)
 
+;; 型情報を複数行で表示（長い型シグネチャも見える）
+(setq eldoc-echo-area-use-multiline-p t)
+
 (use-package eglot
   :bind (nil
          :map eglot-mode-map
@@ -1958,6 +1961,30 @@ How to send a bug report:
    (typescript-ts-mode . eglot-ensure)
    (typescript-mode . eglot-ensure))
   :config
+  ;; TypeScript/JavaScript Inlay Hints - 型の推論と絞り込みを可視化
+  (setq-default eglot-workspace-configuration
+                '(:typescript
+                  (:inlayHints
+                   (:includeInlayParameterNameHints "all"
+                    :includeInlayParameterNameHintsWhenArgumentMatchesName t
+                    :includeInlayFunctionParameterTypeHints t
+                    :includeInlayVariableTypeHints t
+                    :includeInlayVariableTypeHintsWhenTypeMatchesName t
+                    :includeInlayPropertyDeclarationTypeHints t
+                    :includeInlayFunctionLikeReturnTypeHints t
+                    :includeInlayEnumMemberValueHints t))
+                  :javascript
+                  (:inlayHints
+                   (:includeInlayParameterNameHints "all"
+                    :includeInlayParameterNameHintsWhenArgumentMatchesName t
+                    :includeInlayFunctionParameterTypeHints t
+                    :includeInlayVariableTypeHints t
+                    :includeInlayVariableTypeHintsWhenTypeMatchesName t
+                    :includeInlayPropertyDeclarationTypeHints t
+                    :includeInlayFunctionLikeReturnTypeHints t
+                    :includeInlayEnumMemberValueHints t))))
+  ;; Inlay Hints モードを有効化 (Emacs 29+)
+  (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
   (defun my/eglot-capf ()
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
