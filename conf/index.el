@@ -1610,6 +1610,7 @@ How to send a bug report:
 
 (require 'graphql-mode)
 (require 'ob-graphql)
+(require 'ob-typescript)
 
 (require 'projectile-rails)
 (projectile-rails-global-mode)
@@ -1729,6 +1730,9 @@ How to send a bug report:
   (org-babel-do-load-languages
    'org-babel-load-languages
    (cons '(go-test . t) org-babel-load-languages)))
+
+(use-package ob-twoslash
+  :straight (:host github :repo "kijimad/ob-twoslash"))
 
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
@@ -1950,6 +1954,11 @@ How to send a bug report:
 ;; 型情報を複数行で表示（長い型シグネチャも見える）
 (setq eldoc-echo-area-use-multiline-p t)
 
+(use-package eldoc-box
+  :bind (:map eglot-mode-map
+         ("C-c h" . eldoc-box-help-at-point))
+  :hook (eglot-managed-mode . eldoc-box-hover-mode))
+
 (use-package eglot
   :bind (nil
          :map eglot-mode-map
@@ -1985,6 +1994,11 @@ How to send a bug report:
                     :includeInlayEnumMemberValueHints t))))
   ;; Inlay Hints モードを有効化 (Emacs 29+)
   (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
+  ;; 同一シンボルのハイライトをマーカー風の背景色に
+  (set-face-attribute 'eglot-highlight-symbol-face nil
+                      :background "#fff3bf"
+                      :underline nil
+                      :bold nil)
   (defun my/eglot-capf ()
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
@@ -2681,7 +2695,7 @@ How to send a bug report:
 
 (global-set-key (kbd "C-c C-k") 'kill-whole-line)
 
-(defun current-path ()
+(defun kd/current-path ()
   (interactive)
   (let ((file-path buffer-file-name)
         (dir-path default-directory))
@@ -2693,6 +2707,14 @@ How to send a bug report:
            (message "Add Kill Ring: %s" (expand-file-name dir-path)))
           (t
            (error-message-string "Fail to get path name.")))))
+
+(defun kd/git-current-path ()
+  (interactive)
+  (let ((path (magit-file-relative-name)))
+    (if path
+        (progn (kill-new path)
+               (message "Add Kill Ring: %s" path))
+      (error "Not in a git repository or no file"))))
 
 (defun my-isearch-done-opposite (&optional nopush edit)
   "End current search in the opposite side of the match."

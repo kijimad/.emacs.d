@@ -2256,6 +2256,7 @@ Mermaid JSはテキストから図を描画するライブラリ。
 #+begin_src emacs-lisp
   (require 'graphql-mode)
   (require 'ob-graphql)
+  (require 'ob-typescript)
 #+end_src
 
 * Rails
@@ -2434,6 +2435,11 @@ goの設定。
     (org-babel-do-load-languages
      'org-babel-load-languages
      (cons '(go-test . t) org-babel-load-languages)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package ob-twoslash
+    :straight (:host github :repo "kijimad/ob-twoslash"))
 #+end_src
 
 * Haskell
@@ -2703,6 +2709,14 @@ verticoは検索UIを提供するパッケージ。
   (setq eldoc-echo-area-use-multiline-p t)
 #+end_src
 
+#+caption: eldoc-box - カーソル位置にホバー情報をポップアップ表示
+#+begin_src emacs-lisp
+  (use-package eldoc-box
+    :bind (:map eglot-mode-map
+           ("C-c h" . eldoc-box-help-at-point))
+    :hook (eglot-managed-mode . eldoc-box-hover-mode))
+#+end_src
+
 #+caption: eglot
 #+begin_src emacs-lisp
   (use-package eglot
@@ -2740,6 +2754,11 @@ verticoは検索UIを提供するパッケージ。
                       :includeInlayEnumMemberValueHints t))))
     ;; Inlay Hints モードを有効化 (Emacs 29+)
     (add-hook 'eglot-managed-mode-hook #'eglot-inlay-hints-mode)
+    ;; 同一シンボルのハイライトをマーカー風の背景色に
+    (set-face-attribute 'eglot-highlight-symbol-face nil
+                        :background "#fff3bf"
+                        :underline nil
+                        :bold nil)
     (defun my/eglot-capf ()
       (setq-local completion-at-point-functions
                   (list (cape-capf-super
@@ -3639,9 +3658,9 @@ OS操作の便利関数。
   (global-set-key (kbd "C-c C-k") 'kill-whole-line)
 #+end_src
 
-#+caption: カレントパスを取得する
+#+caption: カレントパスを保存する
 #+begin_src emacs-lisp
-  (defun current-path ()
+  (defun kd/current-path ()
     (interactive)
     (let ((file-path buffer-file-name)
           (dir-path default-directory))
@@ -3653,6 +3672,17 @@ OS操作の便利関数。
              (message "Add Kill Ring: %s" (expand-file-name dir-path)))
             (t
              (error-message-string "Fail to get path name.")))))
+#+end_src
+
+#+caption: gitルートからの相対パスを保存する
+#+begin_src emacs-lisp
+  (defun kd/git-current-path ()
+    (interactive)
+    (let ((path (magit-file-relative-name)))
+      (if path
+          (progn (kill-new path)
+                 (message "Add Kill Ring: %s" path))
+        (error "Not in a git repository or no file"))))
 #+end_src
 
 #+caption: i-searchで逆側にカーソルをセットする
