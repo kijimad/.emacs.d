@@ -3012,23 +3012,28 @@ and source-file directory for your debugger."
   (kd/navigate-sibling-file -1))
 
 (defun kd/navigate-sibling-file (direction)
-  "DIRECTION (1 or -1) に応じて、同じディレクトリの次/前のファイルを開く。"
+  "DIRECTION (1 or -1) に応じて、プロジェクト内の次/前のファイルを開く。
+  .git のあるディレクトリをルートとし、全ファイルをパスでソートして一列に並べる。"
   (let* ((current-file (buffer-file-name))
-         (dir (file-name-directory current-file))
-         (current-name (file-name-nondirectory current-file))
-         (files (seq-remove (lambda (f) (file-directory-p (expand-file-name f dir)))
-                          (directory-files dir nil "^[^.]")))
-         (files-sorted (sort files 'string<))
-         (current-index (cl-position current-name files-sorted :test 'equal)))
+         (root (locate-dominating-file current-file ".git"))
+         (default-directory root)
+         ;; git ls-files で追跡ファイル一覧を取得（高速・.gitignore 尊重）
+         (files (split-string
+                 (shell-command-to-string "git ls-files -co --exclude-standard")
+                 "\n" t))
+         ;; フルパスに変換してソート
+         (files-full (sort (mapcar (lambda (f) (expand-file-name f root)) files)
+                           'string<))
+         (current-index (cl-position current-file files-full :test 'equal)))
     (if current-index
         (let* ((next-index (+ current-index direction))
-               (next-file (nth next-index files-sorted)))
-          (if next-file
-              (find-file (expand-file-name next-file dir))
+               (next-file (nth next-index files-full)))
+          (if (and next-file (>= next-index 0))
+              (find-file next-file)
             (message (if (> direction 0)
-                        "最後のファイルです"
-                      "最初のファイルです"))))
-      (message "現在のファイルがディレクトリ一覧に見つかりません"))))
+                         "プロジェクト最後のファイルです"
+                       "プロジェクト最初のファイルです"))))
+      (message "現在のファイルが git 管理下にありません"))))
 
 (global-set-key (kbd "C-c <right>") 'kd/next-file)
 (global-set-key (kbd "C-c <left>") 'kd/previous-file)
