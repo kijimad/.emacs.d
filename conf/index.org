@@ -2259,6 +2259,12 @@ Mermaid JSはテキストから図を描画するライブラリ。
   (require 'ob-typescript)
 #+end_src
 
+#+caption: コードリーディング用のモード
+#+begin_src emacs-lisp
+(use-package zen-mode
+  :straight (:host github :repo "kijimad/zen-mode"))
+#+end_src
+
 * Rails
 #+caption: projectile-rails
 #+begin_src emacs-lisp

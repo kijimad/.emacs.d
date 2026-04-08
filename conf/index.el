@@ -1612,6 +1612,9 @@ How to send a bug report:
 (require 'ob-graphql)
 (require 'ob-typescript)
 
+(use-package zen-mode
+  :straight (:host github :repo "kijimad/zen-mode"))
+
 (require 'projectile-rails)
 (projectile-rails-global-mode)
 (add-hook 'projectile-mode-hook 'projectile-rails-on)
