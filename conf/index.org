@@ -2265,6 +2265,82 @@ Mermaid JSはテキストから図を描画するライブラリ。
   :straight (:host github :repo "kijimad/zen-mode"))
 #+end_src
 
+#+begin_src emacs-lisp
+  (use-package agent-shell
+    :ensure t
+    :config
+    ;; https://github.com/KaitoMuraoka/.emacs.d/blob/3e52874cdfec1ec523916aaa0272a143a5383307/init.el#L255
+    ;; agent-shell--start が呼ばれた瞬間のバッファの dir を保存する
+    ;; 理由: start 内で default-directory が書き換わる前に正しいディレクトリを確保するため
+    (defvar my/agent-shell--invoked-dir nil)
+
+    (advice-add 'agent-shell--start :before
+                (lambda (&rest _)
+                  (setq my/agent-shell--invoked-dir default-directory)))
+
+    ;; Claude Code と同じパスエンコード: / と . を - に変換
+    ;; 例: /Users/foo/.bar → -Users-foo--bar
+    (defun my/agent-shell--encode-path (path)
+      (replace-regexp-in-string "[/.]" "-" (directory-file-name path)))
+
+    ;; 正しいプロジェクトルートをキャプチャ済みの dir から解決する
+    (setq agent-shell-cwd-function
+          (lambda ()
+            (let* ((dir (or my/agent-shell--invoked-dir default-directory))
+                   (proj (let ((default-directory dir))
+                           (when-let ((p (project-current nil)))
+                             (project-root p)))))
+              (or proj dir))))
+
+    ;; 保存先を ~/.claude/projects/{encoded}/agent-shell/{subdir} に変更
+    ;; 理由: Claude Code と同じディレクトリ構造に合わせる
+    (setq agent-shell-dot-subdir-function
+          (lambda (subdir)
+            (let* ((dir (or my/agent-shell--invoked-dir default-directory))
+                   (proj (let ((default-directory dir))
+                           (when-let ((p (project-current nil)))
+                             (project-root p))))
+                   (base (or proj dir))
+                   (encoded (my/agent-shell--encode-path base))
+                   (dest (expand-file-name
+                          (file-name-concat "projects" encoded "agent-shell" subdir)
+                          "~/.claude")))
+              (make-directory dest t)
+              dest))))
+#+end_src
+
+#+caption: トグルで出る用の設定
+#+begin_src shell
+  (scope-toggler-define "agent-shell"
+   :find-buffer (lambda (root)
+                 (seq-first
+                  (seq-filter
+                   (lambda (buf)
+                    (string= (expand-file-name root)
+                     (expand-file-name
+                      (buffer-local-value 'default-directory buf))))
+                     (agent-shell-buffers))))
+    :create (lambda (root)
+              (let* ((default-directory root)
+                     (buf (agent-shell--start
+                           :config (or (agent-shell--resolve-preferred-config)
+                                       (agent-shell-select-config
+                                        :prompt "Start new agent: ")
+                                       (error "No agent config found")))))
+                (when current-prefix-arg
+                  (with-current-buffer buf
+                    (setq-local agent-shell-permission-responder-function
+                                #'agent-shell-permission-allow-always)))
+                buf)))
+
+  (defun my/toggle-agent-shell ()
+    "Toggle `agent-shell' scope for the current project.
+With \\[universal-argument], auto-approve all permissions."
+    (interactive)
+    (scope-toggler-toggle "agent-shell"))
+
+  (global-set-key (kbd "<muhenkan>") #'my/toggle-agent-shell)
+#+end_src
 * Rails
 #+caption: projectile-rails
 #+begin_src emacs-lisp
