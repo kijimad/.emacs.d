@@ -2341,7 +2341,9 @@ Mermaid JSはテキストから図を描画するライブラリ。
         (interactive)
         (scope-toggler-toggle "agent-shell"))
 
-      (global-set-key (kbd "C-M-@") #'my/toggle-agent-shell)
+      (global-set-key (kbd "C-M-}") #'my/toggle-agent-shell)
+
+  ;; ================
 
   (scope-toggler-define "vterm"
     :create (lambda (root)
@@ -2351,7 +2353,7 @@ Mermaid JSはテキストから図を描画するライブラリ。
                                 (directory-file-name root)))))))
 
   (scope-toggler-make-command my/toggle-vterm "vterm")
-  (global-set-key (kbd "C-`") #'my/toggle-vterm)
+  (global-set-key (kbd "C-M-:") #'my/toggle-vterm)
 #+end_src
 
 * Rails

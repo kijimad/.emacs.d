@@ -1687,7 +1687,9 @@ How to send a bug report:
       (interactive)
       (scope-toggler-toggle "agent-shell"))
 
-    (global-set-key (kbd "C-M-@") #'my/toggle-agent-shell)
+    (global-set-key (kbd "C-M-}") #'my/toggle-agent-shell)
+
+;; ================
 
 (scope-toggler-define "vterm"
   :create (lambda (root)
@@ -1697,7 +1699,7 @@ How to send a bug report:
                               (directory-file-name root)))))))
 
 (scope-toggler-make-command my/toggle-vterm "vterm")
-(global-set-key (kbd "C-`") #'my/toggle-vterm)
+(global-set-key (kbd "C-M-:") #'my/toggle-vterm)
 
 (require 'projectile-rails)
 (projectile-rails-global-mode)
