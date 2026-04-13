@@ -1657,6 +1657,48 @@ How to send a bug report:
             (make-directory dest t)
             dest))))
 
+(use-package scope-toggler
+ :straight (:host github :repo "kijimad/scope-toggler"))
+(scope-toggler-define "agent-shell"
+ :find-buffer (lambda (root)
+               (seq-first
+                (seq-filter
+                 (lambda (buf)
+                  (string= (expand-file-name root)
+                   (expand-file-name
+                    (buffer-local-value 'default-directory buf))))
+                       (agent-shell-buffers))))
+      :create (lambda (root)
+                (let* ((default-directory root)
+                       (buf (agent-shell--start
+                             :config (or (agent-shell--resolve-preferred-config)
+                                         (agent-shell-select-config
+                                          :prompt "Start new agent: ")
+                                         (error "No agent config found")))))
+                  (when current-prefix-arg
+                    (with-current-buffer buf
+                      (setq-local agent-shell-permission-responder-function
+                  #'agent-shell-permission-allow-always)))
+                  buf)))
+
+               (defun my/toggle-agent-shell ()
+"Toggle `agent-shell' scope for the current project.
+  With \\[universal-argument], auto-approve all permissions."
+      (interactive)
+      (scope-toggler-toggle "agent-shell"))
+
+    (global-set-key (kbd "C-M-@") #'my/toggle-agent-shell)
+
+(scope-toggler-define "vterm"
+  :create (lambda (root)
+            (let ((default-directory root))
+              (vterm (format "*vterm<%s>*"
+                             (file-name-nondirectory
+                              (directory-file-name root)))))))
+
+(scope-toggler-make-command my/toggle-vterm "vterm")
+(global-set-key (kbd "C-`") #'my/toggle-vterm)
+
 (require 'projectile-rails)
 (projectile-rails-global-mode)
 (add-hook 'projectile-mode-hook 'projectile-rails-on)
@@ -2128,26 +2170,7 @@ How to send a bug report:
 (when window-system
   (require 'vterm)
   (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
-  (setq vterm-toggle-scope 'project)
-  (setq vterm-toggle-project-root t)
-  (setq vterm-max-scrollback 10000)
-  ;; toggle
-  (global-set-key [f9] 'vterm-toggle)
-  (global-set-key (kbd "C-M-:") 'vterm-toggle)
-  (global-set-key [C-f9] 'vterm-toggle-cd)
-
-  (setq vterm-toggle-fullscreen-p nil)
-  (add-to-list 'display-buffer-alist
-               '((lambda(bufname _) (with-current-buffer bufname
-                                      (or (equal major-mode 'vterm-mode)
-                                          (string-prefix-p vterm-buffer-name bufname))))
-                 (display-buffer-reuse-window display-buffer-at-bottom)
-                 ;;(display-buffer-reuse-window display-buffer-in-direction)
-                 ;;display-buffer-in-direction/direction/dedicated is added in emacs27
-                 ;;(direction . bottom)
-                 ;;(dedicated . t) ;dedicated is supported in emacs27
-                 (reusable-frames . visible)
-                 (window-height . 0.3))))
+  (setq vterm-max-scrollback 10000))
 
 (require 'doom-themes)
 (doom-themes-org-config)
@@ -2383,29 +2406,29 @@ How to send a bug report:
   (delete-other-windows)
   (if (file-exists-p org-journal-dir)
       (org-journal-new-entry nil))
-  (vterm-toggle)
-  (vterm-toggle)
+  (my/toggle-vterm)
+  (my/toggle-vterm)
   (persp-switch "2")
   (find-file "~/roam")
-  (vterm-toggle)
-  (vterm-toggle)
+  (my/toggle-vterm)
+  (my/toggle-vterm)
   (org-agenda nil "z")
   (persp-switch "3")
   (split-window-right)
   (switch-to-buffer "Google-chrome")
   (persp-switch "4")
   (switch-to-buffer "Google-chrome")
-  (vterm-toggle)
-  (vterm-toggle)
+  (my/toggle-vterm)
+  (my/toggle-vterm)
   (persp-switch "5")
   (find-file "~/dotfiles")
-  (vterm-toggle)
-  (vterm-toggle)
+  (my/toggle-vterm)
+  (my/toggle-vterm)
   (magit-status)
   (persp-switch "6")
   (find-file "~/.emacs.d/conf")
-  (vterm-toggle)
-  (vterm-toggle)
+  (my/toggle-vterm)
+  (my/toggle-vterm)
   (magit-status)
   (persp-switch "7")
   (find-file "~/ProjectOrg")
@@ -2449,7 +2472,7 @@ How to send a bug report:
           ((= exwm-workspace-current-index 1) (setq dest 0)))
     (exwm-workspace-switch dest)))
 
-(define-key exwm-mode-map (kbd "C-M-:") 'vterm-toggle)
+(define-key exwm-mode-map (kbd "C-M-:") 'my/toggle-vterm)
 (define-key exwm-mode-map (kbd "C-M-<right>") 'persp-next)
 (define-key exwm-mode-map (kbd "C-M-<left>") 'persp-prev)
 (define-key exwm-mode-map (kbd "<henkan>") 'pretty-hydra-henkan/body)
