@@ -1687,7 +1687,8 @@ How to send a bug report:
       (interactive)
       (scope-toggler-toggle "agent-shell"))
 
-    (global-set-key (kbd "C-M-}") #'my/toggle-agent-shell)
+    (global-set-key (kbd "C-M-]") #'my/toggle-agent-shell)
+    (global-set-key (kbd "<muhenkan>") #'my/toggle-agent-shell)
 
 ;; ================
 
