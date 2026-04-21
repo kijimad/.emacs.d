@@ -1702,6 +1702,9 @@ How to send a bug report:
 (scope-toggler-make-command my/toggle-vterm "vterm")
 (global-set-key (kbd "C-M-:") #'my/toggle-vterm)
 
+(use-package egh
+ :straight (:host github :repo "kijimad/egh"))
+
 (require 'projectile-rails)
 (projectile-rails-global-mode)
 (add-hook 'projectile-mode-hook 'projectile-rails-on)

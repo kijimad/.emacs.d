@@ -2357,6 +2357,12 @@ Mermaid JSはテキストから図を描画するライブラリ。
   (global-set-key (kbd "C-M-:") #'my/toggle-vterm)
 #+end_src
 
+#+caption: GitHub操作
+#+begin_src emacs-lisp
+  (use-package egh
+   :straight (:host github :repo "kijimad/egh"))
+#+end_src
+
 * Rails
 #+caption: projectile-rails
 #+begin_src emacs-lisp
