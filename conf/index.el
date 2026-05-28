@@ -730,63 +730,38 @@ How to send a bug report:
 
 (setq org-clock-mode-line-total 'all)
 
-(defun kd/org-pomodoro-remain-gauge (max-minutes)
-  "Display remain time gauge."
-  (let* ((display-len 25)
-         (remaining-minutes (/ (org-pomodoro-remaining-seconds) 60))
-         (current-percent (/ remaining-minutes max-minutes))
-         (done (truncate (* (- 1 current-percent) display-len)))
-         (will (truncate (* current-percent display-len))))
-    (concat
-     "%{T2}"
-     ;; (concat "%{F#008000}" (make-string done ?█) "%{F-}")
-     (concat "%{F#008000}" (make-string done ?|) "%{F-}")
-     (concat "%{F#413839}" (make-string will ?|) "%{F-}")
-     "%{T-}")))
+(defvar kd/pomodoro-actual-total 0
+  "Actual total seconds for current pomodoro/break, captured at start.")
 
-(defun kd/org-pomodoro-time ()
-  "Return the remaining pomodoro time. Function for displaying in Polybar."
-  (cond
-   ((org-pomodoro-active-p) (cl-case org-pomodoro-state
-                              (:pomodoro
-                               (format "%s %dm %s%s%s"
-                                       (kd/org-pomodoro-remain-gauge org-pomodoro-length)
-                                       (/ (org-pomodoro-remaining-seconds) 60)
-                                       "%{F#000000}"
-                                       org-clock-heading
-                                       "%{F-}"
-                                       ))
-                              (:short-break
-                               (format "%s Short break: %dm"
-                                       (kd/org-pomodoro-remain-gauge org-pomodoro-short-break-length)
-                                       (/ (org-pomodoro-remaining-seconds) 60)))
-                              (:long-break
-                               (format "%s Long break: %dm"
-                                       (kd/org-pomodoro-remain-gauge org-pomodoro-long-break-length)
-                                       (/ (org-pomodoro-remaining-seconds) 60)))
-                              (:overtime
-                               (format "Overtime! %dm" (/ (org-pomodoro-remaining-seconds) 60)))
-                              ))
-   ((org-clocking-p) (format "(%s) %s" (org-clock-get-clocked-time) org-clock-heading))
-   (t "OFF")))
+(add-hook 'org-pomodoro-started-hook
+          (lambda () (setq kd/pomodoro-actual-total (* org-pomodoro-length 60))))
+(add-hook 'org-pomodoro-break-started-hook
+          (lambda ()
+            (setq kd/pomodoro-actual-total
+                  (cond ((eq org-pomodoro-state :short-break)
+                         (* org-pomodoro-short-break-length 60))
+                        ((eq org-pomodoro-state :long-break)
+                         (* org-pomodoro-long-break-length 60))
+                        (t 0)))))
 
-(defun kd/effort-timer ()
-  (cond
-   ((and (not org-clock-effort) (or (org-pomodoro-active-p) (org-clocking-p)) "[effort not set]"))
-   ((and org-clock-effort (or (org-pomodoro-active-p) (org-clocking-p))) (format "[%s/%s]" (org-duration-from-minutes (org-clock-get-clocked-time)) org-clock-effort))
-   (t "")))
-
-(defun kd/pmd-today-point-display ()
-  (let* ((all-minute (* kd/pmd-today-point 25))
-         (hour (/ all-minute 60))
-         (minute (% all-minute 60)))
-    (format
-     " %s %dpts/%02dh%02dm"
-     (kd/effort-timer)
-     kd/pmd-today-point
-     hour
-     minute
-     )))
+(defun kd/org-pomodoro-json ()
+  "Return pomodoro state as JSON for Polybar script."
+  (let* ((active (org-pomodoro-active-p))
+         (clocking (org-clocking-p))
+         (state (cond
+                 (active (symbol-name org-pomodoro-state))
+                 (clocking "clocking")
+                 (t "off")))
+         (remaining (if active (org-pomodoro-remaining-seconds) 0))
+         (total (if active kd/pomodoro-actual-total 0))
+         (heading (if (or active clocking)
+                      (replace-regexp-in-string "\"" "\\\\\"" org-clock-heading)
+                    ""))
+         (clocked (if clocking (org-clock-get-clocked-time) 0))
+         (effort (or org-clock-effort ""))
+         (points kd/pmd-today-point))
+    (format "{\"state\":\"%s\",\"remaining\":%d,\"total\":%d,\"heading\":\"%s\",\"clocked\":%d,\"effort\":\"%s\",\"points\":%d}"
+            state remaining total heading clocked effort points)))
 
 (defvar kd/pmd-today-point 0)
 (defvar kd/pmd-start-time nil)
