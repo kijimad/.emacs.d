@@ -1238,7 +1238,7 @@ How to send a bug report:
 (define-key yas-minor-mode-map (kbd "C-x y v") 'yas-visit-snippet-file)
 
 (require 'projectile)
-(projectile-global-mode)
+(projectile-mode +1)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 (defun revert-buffer-no-confirm (&optional force-reverting)

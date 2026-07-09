@@ -1819,7 +1819,7 @@ Mermaid JSはテキストから図を描画するライブラリ。
 #+caption: projectile
 #+begin_src emacs-lisp
   (require 'projectile)
-  (projectile-global-mode)
+  (projectile-mode +1)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 #+end_src
 
