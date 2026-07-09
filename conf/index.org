@@ -1447,11 +1447,6 @@ Mermaid JSはテキストから図を描画するライブラリ。
   (display-line-numbers-mode)
 #+end_src
 
-#+caption: ediffを１ウィンドウで表示
-#+begin_src emacs-lisp
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-#+end_src
-
 #+caption: オートインデントでスペースを使う
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
@@ -1723,8 +1718,18 @@ Mermaid JSはテキストから図を描画するライブラリ。
 #+begin_src emacs-lisp
   (require 'magit)
   (global-set-key (kbd "C-x g") 'magit-status)
-#+end_src
 
+  ;; delta で magit の diff を色付き表示する
+  ;; https://github.com/dandavison/magit-delta
+  (require 'magit-delta)
+  (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+
+  ;; ediffを横2列表示する
+  (setq ediff-split-window-function #'split-window-horizontally)
+
+  ;; ediffを1ウィンドウで縦分割表示
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+#+end_src
 
 #+caption: git-gutter-mode
 #+begin_src emacs-lisp

@@ -982,8 +982,6 @@ How to send a bug report:
 
 (display-line-numbers-mode)
 
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
-
 (setq-default indent-tabs-mode nil)
 
 (setq x-select-enable-primary t)
@@ -1166,6 +1164,17 @@ How to send a bug report:
 
 (require 'magit)
 (global-set-key (kbd "C-x g") 'magit-status)
+
+;; delta で magit の diff を色付き表示する
+;; https://github.com/dandavison/magit-delta
+(require 'magit-delta)
+(add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+
+;; ediffを横2列表示する
+(setq ediff-split-window-function #'split-window-horizontally)
+
+;; ediffを1ウィンドウで縦分割表示
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
 (global-git-gutter-mode 1)
 (global-set-key (kbd "C-c C-v") 'git-gutter:popup-hunk)
